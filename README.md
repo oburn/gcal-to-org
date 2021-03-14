@@ -24,6 +24,10 @@ CLI for creating an Org Mode file based on meetings in a Google Calendar
 [![License](https://img.shields.io/npm/l/google-calendar-to-org-mode.svg)](https://github.com/oburn/google-calendar-to-org-mode/blob/master/package.json)
 
 <!-- toc -->
+* [google-calendar-to-org-mode](#google-calendar-to-org-mode)
+* [Notes](#notes)
+* [Developing](#developing)
+* [oclif README #](#oclif-readme-)
 * [Usage](#usage)
 * [Commands](#commands)
 <!-- tocstop -->
