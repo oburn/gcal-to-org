@@ -1,4 +1,5 @@
 import {Command, flags} from '@oclif/command'
+import { MY_CLIENT_ID, MY_CLIENT_SECRET } from './secrets'
 
 class GoogleCalendarToOrgMode extends Command {
   static description = 'describe the command here'
@@ -23,6 +24,9 @@ class GoogleCalendarToOrgMode extends Command {
     if (args.file && flags.force) {
       this.log(`you input --force and --file: ${args.file}`)
     }
+    this.log(`         MY_CLIENT_ID = ${MY_CLIENT_ID}`)
+    this.log(`     MY_CLIENT_SECRET = ${MY_CLIENT_SECRET}`)
+    this.log(`  this.config.dataDir = ${this.config.dataDir}`)
   }
 }
 

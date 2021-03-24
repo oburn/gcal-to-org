@@ -11,6 +11,8 @@ Also to setup Github Actions to understand the excitment.
 
 Using [Node Version Manager](https://github.com/nvm-sh/nvm) for managing the Node environment. Run `nvm use` to setup the environment when in the directory (it uses the `.nvmrc` file).
 
+Need to create an OAuth project in Google Console. The secret credentials will go into the file `src/secrets.ts` which be created by copying the file `src/secrets.ts.template`. Do no checking secrets to Git!
+
 # oclif README #
 
 google-calendar-to-org-mode
