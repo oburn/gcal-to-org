@@ -1,23 +1,13 @@
 import { Command, flags } from '@oclif/command'
 import { MY_CLIENT_ID, MY_CLIENT_SECRET } from './secrets'
-import fs = require("fs");
 import path = require("path");
 import { google, Auth, calendar_v3 } from 'googleapis';
-import http = require("http")
-import url = require("url")
-import opn = require('open');
-import destroyer = require("server-destroy");
+import { ClientFactory } from './client';
 
 class GoogleCalendarToOrgMode extends Command {
   static description = `
   Outputs your main Google Calendar in Org mode format
   `
-
-  static MY_REDIRECT_URL = 'http://localhost:3000/oauth2callback'
-  static SCOPES = [
-    'https://www.googleapis.com/auth/calendar.events.owned.readonly'
-  ];
-
   static flags = {
     // add --version flag to show CLI version
     version: flags.version({ char: 'v' }),
@@ -45,7 +35,15 @@ class GoogleCalendarToOrgMode extends Command {
     this.log(`    flags.forwardDays = ${flags.forwardDays}`)
 
     this.log(`creating a client`)
-    const client = await this.createClient()
+    //const client = await this.createClient()
+    const factory = new ClientFactory({
+      clientId: MY_CLIENT_ID,
+      clientSecret: MY_CLIENT_SECRET,
+      port: flags.port,
+      tokenFileName: path.join(this.config.dataDir, `token.json`),
+      scopes: ['https://www.googleapis.com/auth/calendar.events.owned.readonly']
+    })
+    const client = await factory.createClient()
     this.log(`have the client`)
 
     const calendar = google.calendar({ version: 'v3', auth: client })
@@ -75,64 +73,6 @@ class GoogleCalendarToOrgMode extends Command {
       }
       listParams.pageToken = eventsResp.data.nextPageToken
     }
-  }
-
-  async createClient(): Promise<Auth.OAuth2Client> {
-    const result = new Auth.OAuth2Client(MY_CLIENT_ID, MY_CLIENT_SECRET, GoogleCalendarToOrgMode.MY_REDIRECT_URL);
-    const tokenFileName = path.join(this.config.dataDir, `token.json`);
-    this.log(`Attempting to read ${tokenFileName}`)
-    let token = null
-    if (fs.existsSync(tokenFileName)) {
-      this.log(`Need to read the token`)
-      token = JSON.parse(fs.readFileSync(tokenFileName).toString())
-    } else {
-      this.log(`need to create the token`)
-      token = await this.obtainToken(result, 3000)
-      this.log(`need to save the token to ${tokenFileName}`)
-      fs.mkdirSync(this.config.dataDir, { recursive: true })
-      fs.writeFileSync(tokenFileName, JSON.stringify(token))
-    }
-
-    result.setCredentials(token)
-
-    this.log(`Need to result.setCredentials(token);`)
-    return result
-  }
-
-  obtainToken(client: Auth.OAuth2Client, port: number): Promise<Auth.Credentials> {
-    return new Promise((resolve, reject) => {
-      const authUrl = client.generateAuthUrl({
-        access_type: 'offline',
-        scope: GoogleCalendarToOrgMode.SCOPES,
-      });
-      this.log(`Need to authorise using ${authUrl}`)
-
-      const server = http.createServer(async (req, res) => {
-        try {
-          if (req.url && (req.url.indexOf('/oauth2callback') > -1)) {
-            this.log("received the callback")
-            const qs = new url.URL(req.url, `http://localhost:${port}`).searchParams;
-            res.end('Authentication successful! Please return to the console.');
-            this.log("attempt to destroy")
-            server.destroy();
-            this.log("expanding the tokens")
-            // hard code that there is code!!
-            //if (qs.has('code'))
-            const { tokens } = await client.getToken(qs.get('code')!);
-            this.log("returning hte tokens")
-            // client.credentials = tokens; // eslint-disable-line require-atomic-updates
-            resolve(tokens);
-            return tokens
-          }
-        } catch (e) {
-          reject(e);
-        }
-      }).listen(3000, () => {
-        // open the browser to the authorize url to start the workflow
-        opn(authUrl, { wait: false }).then(cp => cp.unref());
-      })
-      destroyer(server);
-    })
   }
 }
 
