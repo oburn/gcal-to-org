@@ -22,6 +22,9 @@ class GoogleCalendarToOrgMode extends Command {
     // add --version flag to show CLI version
     version: flags.version({ char: 'v' }),
     help: flags.help({ char: 'h' }),
+    port: flags.integer({ default: 3000, description: 'The port to run the callback server on localhost.' }),
+    backDays: flags.integer({ default: 3650, description: "How many days back to process events." }),
+    forwardDays: flags.integer({ default: 365, description: "How many days forward to process events." })
   }
 
   static args = [
@@ -37,6 +40,9 @@ class GoogleCalendarToOrgMode extends Command {
     this.log(`Running with:`)
     this.log(`            args.file = ${args.file}`)
     this.log(`  this.config.dataDir = ${this.config.dataDir}`)
+    this.log(`           flags.port = ${flags.port}`)
+    this.log(`       flags.backDays = ${flags.backDays}`)
+    this.log(`    flags.forwardDays = ${flags.forwardDays}`)
 
     this.log(`creating a client`)
     const client = await this.createClient()
@@ -44,10 +50,10 @@ class GoogleCalendarToOrgMode extends Command {
 
     const calendar = google.calendar({ version: 'v3', auth: client })
     const min = new Date()
-    min.setDate(min.getDate() - 1)
+    min.setDate(min.getDate() - flags.backDays)
     const timeMin = min.toISOString()
     const max = new Date()
-    max.setDate(max.getDate() + 1)
+    max.setDate(max.getDate() + flags.forwardDays)
     const timeMax = max.toISOString()
     this.log(`using timeMin ${timeMin} and timeMax ${timeMax}`)
 
@@ -81,7 +87,7 @@ class GoogleCalendarToOrgMode extends Command {
       token = JSON.parse(fs.readFileSync(tokenFileName).toString())
     } else {
       this.log(`need to create the token`)
-      token = await this.obtainToken(result)
+      token = await this.obtainToken(result, 3000)
       this.log(`need to save the token to ${tokenFileName}`)
       fs.mkdirSync(this.config.dataDir, { recursive: true })
       fs.writeFileSync(tokenFileName, JSON.stringify(token))
@@ -93,7 +99,7 @@ class GoogleCalendarToOrgMode extends Command {
     return result
   }
 
-  obtainToken(client: Auth.OAuth2Client): Promise<Auth.Credentials> {
+  obtainToken(client: Auth.OAuth2Client, port: number): Promise<Auth.Credentials> {
     return new Promise((resolve, reject) => {
       const authUrl = client.generateAuthUrl({
         access_type: 'offline',
@@ -105,7 +111,7 @@ class GoogleCalendarToOrgMode extends Command {
         try {
           if (req.url && (req.url.indexOf('/oauth2callback') > -1)) {
             this.log("received the callback")
-            const qs = new url.URL(req.url, 'http://localhost:3000').searchParams;
+            const qs = new url.URL(req.url, `http://localhost:${port}`).searchParams;
             res.end('Authentication successful! Please return to the console.');
             this.log("attempt to destroy")
             server.destroy();
