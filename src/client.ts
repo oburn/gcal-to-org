@@ -1,9 +1,9 @@
-import { google, Auth, calendar_v3 } from 'googleapis';
-import fs = require("fs");
-import path = require("path");
-import opn = require('open');
+import { Auth } from 'googleapis';
 import destroyer = require("server-destroy");
+import fs = require("fs");
 import http = require("http")
+import opn = require('open');
+import path = require("path");
 import url = require("url")
 
 export interface FactoryParams {

@@ -51,6 +51,7 @@
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.2",
+    "date-fns": "^2.19.0",
     "googleapis": "^68.0.0",
     "open": "^8.0.4",
     "server-destroy": "^1.0.1",
