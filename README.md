@@ -13,6 +13,26 @@ Using [Node Version Manager](https://github.com/nvm-sh/nvm) for managing the Nod
 
 Need to create an OAuth project in Google Console. The secret credentials will go into the file `src/secrets.ts` which be created by copying the file `src/secrets.ts.template`. Do no checking secrets to Git!
 
+Can override the `XDG_DATA_HOME` environment variable to change where the data file is stored. I use the following when running for local testing:
+
+```sh
+$ XDG_DATA_HOME=/tmp/store ./bin/run --backDays=1 --forwardDays=1 --port=3003 /tmp/org.org
+```
+
+# Generating native image #
+
+Using <https://github.com/vercel/pkg> to generate the native image. Install it using:
+
+```sh
+$ npm install -g pkg
+```
+
+To build an image on MacOS run (it's slow):
+
+```sh
+pkg -t node14-macos-x64 .
+```
+
 # oclif README #
 
 google-calendar-to-org-mode

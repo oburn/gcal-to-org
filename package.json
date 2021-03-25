@@ -6,6 +6,9 @@
   "bin": {
     "google-calendar-to-org-mode": "./bin/run"
   },
+  "pkg": {
+    "scripts": "./lib/**/*.js"
+  },
   "bugs": "https://github.com/oburn/google-calendar-to-org-mode/issues",
   "devDependencies": {
     "@oclif/dev-cli": "^1.26.0",
