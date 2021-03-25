@@ -40,7 +40,7 @@ $ npm install -g google-calendar-to-org-mode
 $ google-calendar-to-org-mode COMMAND
 running command...
 $ google-calendar-to-org-mode (-v|--version|version)
-google-calendar-to-org-mode/0.0.1 linux-x64 node-v14.15.5
+google-calendar-to-org-mode/0.0.1 darwin-x64 node-v14.15.5
 $ google-calendar-to-org-mode --help [COMMAND]
 USAGE
   $ google-calendar-to-org-mode COMMAND
