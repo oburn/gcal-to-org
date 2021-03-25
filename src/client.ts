@@ -31,22 +31,17 @@ export class ClientFactory {
             this.params.clientSecret,
             this.redirectUrl());
 
-        console.log(`Attempting to read ${this.params.tokenFileName}`)
         let token = null
         if (fs.existsSync(this.params.tokenFileName)) {
-            console.log(`Need to read the token`)
             token = JSON.parse(fs.readFileSync(this.params.tokenFileName).toString())
         } else {
-            console.log(`need to create the token`)
             token = await this.obtainToken(result)
-            console.log(`need to save the token to ${this.params.tokenFileName}`)
+            console.log(`Saving the token to ${this.params.tokenFileName}`)
             fs.mkdirSync(path.dirname(this.params.tokenFileName), { recursive: true })
             fs.writeFileSync(this.params.tokenFileName, JSON.stringify(token))
         }
 
         result.setCredentials(token)
-
-        console.log(`Need to result.setCredentials(token);`)
         return result
     }
     private redirectUrl(): string {
@@ -64,17 +59,12 @@ export class ClientFactory {
             const server = http.createServer(async (req, res) => {
                 try {
                     if (req.url && (req.url.indexOf('/oauth2callback') > -1)) {
-                        console.log("received the callback")
                         const qs = new url.URL(req.url, `http://localhost:${this.params.port}`).searchParams;
                         res.end('Authentication successful! Please return to the console.');
-                        console.log("attempt to destroy")
                         server.destroy();
-                        console.log("expanding the tokens")
                         // hard code that there is code!!
                         //if (qs.has('code'))
                         const { tokens } = await client.getToken(qs.get('code')!);
-                        console.log("returning hte tokens")
-                        // client.credentials = tokens; // eslint-disable-line require-atomic-updates
                         resolve(tokens);
                         return tokens
                     }

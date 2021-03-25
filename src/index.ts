@@ -25,17 +25,8 @@ class GoogleCalendarToOrgMode extends Command {
     }]
 
   async run() {
+    // parse arguments and create a client
     const { args, flags } = this.parse(GoogleCalendarToOrgMode)
-
-    this.log(`Running with:`)
-    this.log(`            args.file = ${args.file}`)
-    this.log(`  this.config.dataDir = ${this.config.dataDir}`)
-    this.log(`           flags.port = ${flags.port}`)
-    this.log(`       flags.backDays = ${flags.backDays}`)
-    this.log(`    flags.forwardDays = ${flags.forwardDays}`)
-
-    this.log(`creating a client`)
-    //const client = await this.createClient()
     const factory = new ClientFactory({
       clientId: MY_CLIENT_ID,
       clientSecret: MY_CLIENT_SECRET,
@@ -44,8 +35,8 @@ class GoogleCalendarToOrgMode extends Command {
       scopes: ['https://www.googleapis.com/auth/calendar.events.owned.readonly']
     })
     const client = await factory.createClient()
-    this.log(`have the client`)
 
+    // create the request for the calendar entries
     const calendar = google.calendar({ version: 'v3', auth: client })
     const min = new Date()
     min.setDate(min.getDate() - flags.backDays)
@@ -62,6 +53,7 @@ class GoogleCalendarToOrgMode extends Command {
       timeMax: timeMax,
     }
 
+    // process the entries
     while (true) {
       const eventsResp = await calendar.events.list(listParams)
       eventsResp.data.items?.forEach(e => {
