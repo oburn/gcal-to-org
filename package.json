@@ -1,7 +1,7 @@
 {
   "name": "gcal-to-org",
   "description": "CLI for creating an Org Mode file based on meetings in a Google Calendar",
-  "version": "0.0.1",
+  "version": "1.0.0-SNAPSHOT",
   "author": "Oliver Burn @oburn",
   "bin": {
     "gcal-to-org": "./bin/run-exec"
@@ -44,7 +44,7 @@
   },
   "repository": "oburn/gcal-to-org",
   "scripts": {
-    "genbinary": "rm -rf lib && tsc -b && pkg -t node14.4.0-macos-x64 .",
+    "genbinary": "rm -rf lib && tsc -b && pkg --targets node14.4.0-macos-x64,node14.4.0-linux-x64 --out-dir dist .",
     "build": "tsc",
     "posttest": "eslint . --ext .ts --config .eslintrc",
     "prepack": "rm -rf lib && tsc -b && oclif-dev readme",
