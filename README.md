@@ -1,73 +1,56 @@
 # gcal-to-org
-CLI for creating an Org Mode file based on meetings in a Google Calendar
+A command-line interface (CLI) for creating an [Org Mode](https://orgmode.org/) file based on meetings in the primary Google Calendar for a user.
 
-# Notes
+The CLI uses OAuth to get access to your calendar. Check out [this video](https://youtu.be/mEgzs_NfEyw) to see it in action.
 
-The plan is to build using Typescript and the [oclif](https://oclif.io/docs/introduction) framework.
+It is licensed under [Apache 2.0](LICENSE).
 
-Also to setup Github Actions to understand the excitment.
-
-# Developing
-
-Using [Node Version Manager](https://github.com/nvm-sh/nvm) for managing the Node environment. Run `nvm use` to setup the environment when in the directory (it uses the `.nvmrc` file).
-
-Need to create an OAuth project in Google Console. The secret credentials will go into the file `src/secrets.ts` which be created by copying the file `src/secrets.ts.template`. Do no checking secrets to Git!
-
-Can override the `XDG_DATA_HOME` environment variable to change where the data file is stored. I use the following when running for local testing:
-
-```sh
-$ XDG_DATA_HOME=/tmp/store ./bin/run --backDays=1 --forwardDays=1 --port=3003 /tmp/org.org
-```
-
-# Generating native image #
-
-Using <https://github.com/vercel/pkg> to generate the native image. Install it using:
-
-```sh
-$ npm install -g pkg
-```
-
-To build an image on MacOS run (it's slow):
-
-```sh
-pkg -t node14-macos-x64 .
-```
-
-# oclif README #
-
-gcal-to-org
-===========================
-
-CLI for creating an Org Mode file based on meetings in a Google Calendar
-
-[![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![Version](https://img.shields.io/npm/v/gcal-to-org.svg)](https://npmjs.org/package/gcal-to-org)
-[![Downloads/week](https://img.shields.io/npm/dw/gcal-to-org.svg)](https://npmjs.org/package/gcal-to-org)
-[![License](https://img.shields.io/npm/l/gcal-to-org.svg)](https://github.com/oburn/gcal-to-org/blob/master/package.json)
-
-<!-- toc -->
-* [gcal-to-org](#gcal-to-org)
-* [Notes](#notes)
-* [Developing](#developing)
-* [oclif README #](#oclif-readme-)
-* [Usage](#usage)
-* [Commands](#commands)
-<!-- tocstop -->
 # Usage
-<!-- usage -->
-```sh-session
-$ npm install -g gcal-to-org
-$ gcal-to-org COMMAND
-running command...
-$ gcal-to-org (-v|--version|version)
-gcal-to-org/0.0.1 darwin-x64 node-v14.15.5
-$ gcal-to-org --help [COMMAND]
-USAGE
-  $ gcal-to-org COMMAND
-...
-```
-<!-- usagestop -->
-# Commands
-<!-- commands -->
 
-<!-- commandsstop -->
+```bash
+prompt% gcal-to-org-macos --help
+USAGE
+  $ gcal-to-org FILE
+
+ARGUMENTS
+  FILE  Path to output the Org file (will be overwritten)
+
+OPTIONS
+  -h, --help                 show CLI help
+  -v, --version              show CLI version
+  --backDays=backDays        [default: 720] How many days back to process events.
+  --forwardDays=forwardDays  [default: 365] How many days forward to process events.
+  --port=port                [default: 3000] The port to run the callback server on localhost.
+
+DESCRIPTION
+  Outputs your main Google Calendar in Org mode format
+```
+
+When run for the first time it will ask you to authorise the CLI to have access to your Google Calendar. A token is stored in a data directory ([see here](https://oclif.io/docs/config) for the default on your OS). You can override by setting the `XDG_DATA_HOME` environment variable.
+
+An example use could be:
+
+```bash
+prompt% XDG_DATA_HOME=/tmp/store gcal-to-org-macos --backDays=1 --forwardDays=1 /tmp/org.org
+```
+
+# Development
+
+This CLI has been developed using:
+- [oclif framework](https://oclif.io/docs/introduction) using Typescript
+- [pkg](https://github.com/vercel/pkg) to generate the native image
+- [Node Version Manager](https://github.com/nvm-sh/nvm) for managing the Node environment
+
+If you want to build this tool yourself, then you will need to register an Oauth app with Google via the [console](https://console.cloud.google.com/getting-started). You are on your own to do this. But when you do, you will need to:
+1. Copy `src/secrets.ts.template` to `src/secrets.ts`
+2. Fill in the `MY_CLIENT_ID` and `MY_CLIENT_SECRET` details.
+
+To build from scratch, assuming you have installed oclif, nvm and pkg:
+
+```bash
+prompt% nvm use
+prompt% npm install
+prompt% npm run genbinary
+```
+
+The binaries are in `dist`.
