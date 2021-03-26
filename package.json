@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "author": "Oliver Burn @oburn",
   "bin": {
-    "google-calendar-to-org-mode": "./bin/run"
+    "google-calendar-to-org-mode": "./bin/run-exec"
   },
   "pkg": {
     "scripts": "./lib/**/*.js"
@@ -44,6 +44,8 @@
   },
   "repository": "oburn/google-calendar-to-org-mode",
   "scripts": {
+    "genbinary": "rm -rf lib && tsc -b && pkg -t node14.4.0-macos-x64 .",
+    "build": "tsc",
     "posttest": "eslint . --ext .ts --config .eslintrc",
     "prepack": "rm -rf lib && tsc -b && oclif-dev readme",
     "test": "nyc --require ts-node/register --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
