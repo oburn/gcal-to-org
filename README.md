@@ -1,4 +1,4 @@
-# google-calendar-to-org-mode
+# gcal-to-org
 CLI for creating an Org Mode file based on meetings in a Google Calendar
 
 # Notes
@@ -35,18 +35,18 @@ pkg -t node14-macos-x64 .
 
 # oclif README #
 
-google-calendar-to-org-mode
+gcal-to-org
 ===========================
 
 CLI for creating an Org Mode file based on meetings in a Google Calendar
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![Version](https://img.shields.io/npm/v/google-calendar-to-org-mode.svg)](https://npmjs.org/package/google-calendar-to-org-mode)
-[![Downloads/week](https://img.shields.io/npm/dw/google-calendar-to-org-mode.svg)](https://npmjs.org/package/google-calendar-to-org-mode)
-[![License](https://img.shields.io/npm/l/google-calendar-to-org-mode.svg)](https://github.com/oburn/google-calendar-to-org-mode/blob/master/package.json)
+[![Version](https://img.shields.io/npm/v/gcal-to-org.svg)](https://npmjs.org/package/gcal-to-org)
+[![Downloads/week](https://img.shields.io/npm/dw/gcal-to-org.svg)](https://npmjs.org/package/gcal-to-org)
+[![License](https://img.shields.io/npm/l/gcal-to-org.svg)](https://github.com/oburn/gcal-to-org/blob/master/package.json)
 
 <!-- toc -->
-* [google-calendar-to-org-mode](#google-calendar-to-org-mode)
+* [gcal-to-org](#gcal-to-org)
 * [Notes](#notes)
 * [Developing](#developing)
 * [oclif README #](#oclif-readme-)
@@ -56,14 +56,14 @@ CLI for creating an Org Mode file based on meetings in a Google Calendar
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g google-calendar-to-org-mode
-$ google-calendar-to-org-mode COMMAND
+$ npm install -g gcal-to-org
+$ gcal-to-org COMMAND
 running command...
-$ google-calendar-to-org-mode (-v|--version|version)
-google-calendar-to-org-mode/0.0.1 darwin-x64 node-v14.15.5
-$ google-calendar-to-org-mode --help [COMMAND]
+$ gcal-to-org (-v|--version|version)
+gcal-to-org/0.0.1 darwin-x64 node-v14.15.5
+$ gcal-to-org --help [COMMAND]
 USAGE
-  $ google-calendar-to-org-mode COMMAND
+  $ gcal-to-org COMMAND
 ...
 ```
 <!-- usagestop -->

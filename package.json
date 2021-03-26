@@ -1,15 +1,15 @@
 {
-  "name": "google-calendar-to-org-mode",
+  "name": "gcal-to-org",
   "description": "CLI for creating an Org Mode file based on meetings in a Google Calendar",
   "version": "0.0.1",
   "author": "Oliver Burn @oburn",
   "bin": {
-    "google-calendar-to-org-mode": "./bin/run-exec"
+    "gcal-to-org": "./bin/run-exec"
   },
   "pkg": {
     "scripts": "./lib/**/*.js"
   },
-  "bugs": "https://github.com/oburn/google-calendar-to-org-mode/issues",
+  "bugs": "https://github.com/oburn/gcal-to-org/issues",
   "devDependencies": {
     "@oclif/dev-cli": "^1.26.0",
     "@oclif/test": "^1.2.8",
@@ -33,16 +33,16 @@
     "/bin",
     "/lib"
   ],
-  "homepage": "https://github.com/oburn/google-calendar-to-org-mode",
+  "homepage": "https://github.com/oburn/gcal-to-org",
   "keywords": [
     "oclif"
   ],
   "license": "Apache-2.0",
   "main": "lib/index.js",
   "oclif": {
-    "bin": "google-calendar-to-org-mode"
+    "bin": "gcal-to-org"
   },
-  "repository": "oburn/google-calendar-to-org-mode",
+  "repository": "oburn/gcal-to-org",
   "scripts": {
     "genbinary": "rm -rf lib && tsc -b && pkg -t node14.4.0-macos-x64 .",
     "build": "tsc",

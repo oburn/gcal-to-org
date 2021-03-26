@@ -6,7 +6,7 @@ import fs = require("fs");
 import path = require("path");
 import { addDays, format } from 'date-fns'
 
-class GoogleCalendarToOrgMode extends Command {
+class GcalToOrg extends Command {
   static description = `
   Outputs your main Google Calendar in Org mode format
   `
@@ -28,7 +28,7 @@ class GoogleCalendarToOrgMode extends Command {
 
   async run() {
     // parse arguments and create a client
-    const { args, flags } = this.parse(GoogleCalendarToOrgMode)
+    const { args, flags } = this.parse(GcalToOrg)
     const factory = new ClientFactory({
       clientId: MY_CLIENT_ID,
       clientSecret: MY_CLIENT_SECRET,
@@ -108,4 +108,4 @@ function acceptedOrCreated(e: calendar_v3.Schema$Event): boolean {
   return false
 }
 
-export = GoogleCalendarToOrgMode
+export = GcalToOrg

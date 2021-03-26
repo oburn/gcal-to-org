@@ -2,7 +2,7 @@ import {expect, test} from '@oclif/test'
 
 import cmd = require('../src')
 
-describe('google-calendar-to-org-mode', () => {
+describe('gcal-to-org', () => {
   test
   .stdout()
   .do(() => cmd.run([]))
