@@ -5,6 +5,8 @@ The CLI uses OAuth to get access to your calendar. Check out [this video](https:
 
 It is licensed under [Apache 2.0](LICENSE).
 
+Releases should be [available here](releases). An attempt is made to use semantic versioning.
+
 # Usage
 
 ```bash
