@@ -49,8 +49,15 @@ If you want to build this tool yourself, then you will need to register an Oauth
 
 To build from scratch, assuming you have installed oclif, nvm and pkg:
 
-```bash
-prompt% nvm use
+To build, it is assumed:
+
+1. `npm` is installed, either by `nvm` or `asdf`. If the later, then the `.tool-versions` file will have you sorted out.
+2. The latest version of `npm` is installed - you will be prompted if not
+3. The latest version of `pkg` is installed - done via `npm install -g pkg`
+
+Then it's a simple matter of:
+
+```zsh
 prompt% npm install
 prompt% npm run genbinary
 ```
