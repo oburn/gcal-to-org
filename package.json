@@ -20,7 +20,7 @@
     "@oclif/core": "^2",
     "@oclif/plugin-help": "^5",
     "date-fns": "^2.19.0",
-    "googleapis": "^68.0.0",
+    "googleapis": "^112.0.0",
     "open": "^8.0.4",
     "server-destroy": "^1.0.1"
   },
@@ -51,7 +51,7 @@
     ]
   },
   "scripts": {
-    "genbinary": "rm -rf lib && tsc -b && pkg --targets node18-macos-x64,node18-linux-x64 --out-dir dist .",
+    "genbinary": "rm -rf dist && tsc -b && pkg --targets node18-macos-x64,node18-linux-x64 --out-dir dist .",
     "build": "shx rm -rf dist && tsc -b",
     "lint": "eslint . --ext .ts --config .eslintrc",
     "postpack": "shx rm -f oclif.manifest.json",

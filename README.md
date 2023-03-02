@@ -66,3 +66,12 @@ prompt% npm run genbinary
 ```
 
 The binaries are in `dist`.
+
+If looking to update packages, use `npx npm-check` or `npx npm-check -u` if feeling brave.
+
+To run locally:
+
+- Before packaging - `XDG_DATA_HOME=/tmp/store ./bin/dev generate --backDays=1 --forwardDays=1 /tmp/gcal.org`
+- After packaging - `XDG_DATA_HOME=/tmp/store ./dist/gcal-to-org-macos generate --backDays=2 --forwardDays=2 /tmp/gcal.org`
+
+Remove `/tmp/store` to simulate starting from scratch.

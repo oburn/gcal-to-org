@@ -13,7 +13,7 @@ export default class Generate extends Command {
   static description = 'Generates the org file'
 
   static examples = [
-    '<%= config.bin %> <%= command.id %>',
+    '<%= config.bin %> <%= command.id %> gcalendar.org',
   ]
 
   static flags = {
