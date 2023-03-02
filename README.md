@@ -10,22 +10,25 @@ Releases should be [available here](https://github.com/oburn/gcal-to-org/release
 # Usage
 
 ```
-prompt% gcal-to-org-macos --help
+prompt% gcal-to-org-macos generate --help
+Generates the org file
+
 USAGE
-  $ gcal-to-org FILE
+  $ gcal-to-org generate FILE [--port <value>] [--backDays <value>] [--forwardDays <value>]
 
 ARGUMENTS
   FILE  Path to output the Org file (will be overwritten)
 
-OPTIONS
-  -h, --help                 show CLI help
-  -v, --version              show CLI version
-  --backDays=backDays        [default: 720] How many days back to process events.
-  --forwardDays=forwardDays  [default: 365] How many days forward to process events.
-  --port=port                [default: 3000] The port to run the callback server on localhost.
+FLAGS
+  --backDays=<value>     [default: 30] How many days back to process events.
+  --forwardDays=<value>  [default: 60] How many days forward to process events.
+  --port=<value>         [default: 3000] The port to run the callback server on localhost.
 
 DESCRIPTION
-  Outputs your main Google Calendar in Org mode format
+  Generates the org file
+
+EXAMPLES
+  $ gcal-to-org generate gcalender.org
 ```
 
 When run for the first time it will ask you to authorise the CLI to have access to your Google Calendar. A token is stored in a data directory ([see here](https://oclif.io/docs/config) for the default on your OS). You can override by setting the `XDG_DATA_HOME` environment variable.
