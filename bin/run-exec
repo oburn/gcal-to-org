@@ -1,6 +1,0 @@
-#!/usr/bin/env node
-
-// My simple launcher to make generation with `pkg` easier
-
-require('..').run()
-.catch(require('@oclif/errors/handle'))
