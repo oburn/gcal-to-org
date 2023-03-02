@@ -1,65 +1,71 @@
 {
   "name": "gcal-to-org",
-  "description": "CLI for creating an Org Mode file based on meetings in a Google Calendar",
   "version": "2.0-SNAPSHOT",
+  "description": "CLI for creating an Org Mode file based on meetings in a Google Calendar",
   "author": "Oliver Burn @oburn",
   "bin": {
-    "gcal-to-org": "./bin/run-exec"
+    "gcal-to-org": "./bin/run"
   },
-  "pkg": {
-    "scripts": "./lib/**/*.js"
-  },
-  "bugs": "https://github.com/oburn/gcal-to-org/issues",
-  "devDependencies": {
-    "@oclif/dev-cli": "^1.26.0",
-    "@oclif/test": "^1.2.8",
-    "@types/chai": "^4.2.15",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^10.17.54",
-    "@types/server-destroy": "^1.0.1",
-    "chai": "^4.3.0",
-    "eslint": "^5.16.0",
-    "eslint-config-oclif": "^3.1.0",
-    "eslint-config-oclif-typescript": "^0.1.0",
-    "mocha": "^8.3.2",
-    "nyc": "^14.1.1",
-    "ts-node": "^8.10.2",
-    "typescript": "^3.9.9"
-  },
-  "engines": {
-    "node": ">=8.0.0"
-  },
+  "homepage": "https://github.com/oburn/gcal-to-org",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "repository": "oburn/gcal-to-org",
   "files": [
     "/bin",
-    "/lib"
+    "/dist",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/oburn/gcal-to-org",
-  "keywords": [
-    "oclif"
-  ],
-  "license": "Apache-2.0",
-  "main": "lib/index.js",
-  "oclif": {
-    "bin": "gcal-to-org"
-  },
-  "repository": "oburn/gcal-to-org",
-  "scripts": {
-    "genbinary": "rm -rf lib && tsc -b && pkg --targets node18-macos-x64,node18-linux-x64 --out-dir dist .",
-    "build": "tsc",
-    "posttest": "eslint . --ext .ts --config .eslintrc",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev readme",
-    "test": "nyc --require ts-node/register --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
-    "version": "oclif-dev readme && git add README.md"
-  },
-  "types": "lib/index.d.ts",
   "dependencies": {
-    "@oclif/command": "^1.8.0",
-    "@oclif/config": "^1.17.0",
-    "@oclif/plugin-help": "^3.2.2",
+    "@oclif/core": "^2",
+    "@oclif/plugin-help": "^5",
     "date-fns": "^2.19.0",
     "googleapis": "^68.0.0",
     "open": "^8.0.4",
-    "server-destroy": "^1.0.1",
-    "tslib": "^1.14.1"
-  }
+    "server-destroy": "^1.0.1"
+  },
+  "bugs": "https://github.com/oburn/gcal-to-org/issues",
+  "devDependencies": {
+    "@oclif/test": "^2.3.7",
+    "@types/chai": "^4",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.18.12",
+    "@types/server-destroy": "^1.0.1",
+    "chai": "^4",
+    "eslint": "^7.32.0",
+    "eslint-config-oclif": "^4",
+    "eslint-config-oclif-typescript": "^1.0.3",
+    "mocha": "^9",
+    "oclif": "^3",
+    "shx": "^0.3.3",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.5.0",
+    "typescript": "^4.9.5"
+  },
+  "oclif": {
+    "bin": "gcal-to-org",
+    "dirname": "gcal-to-org",
+    "commands": "./dist/commands",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "scripts": {
+    "genbinary": "rm -rf lib && tsc -b && pkg --targets node18-macos-x64,node18-linux-x64 --out-dir dist .",
+    "build": "shx rm -rf dist && tsc -b",
+    "lint": "eslint . --ext .ts --config .eslintrc",
+    "postpack": "shx rm -f oclif.manifest.json",
+    "posttest": "yarn lint",
+    "prepack": "yarn build && oclif manifest && oclif readme",
+    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
+    "version": "oclif readme && git add README.md"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "bugs": "https://github.com/oburn/gcal-to-org/issues",
+  "keywords": [
+    "oclif"
+  ],
+  "types": "dist/index.d.ts"
 }
