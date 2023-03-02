@@ -1,6 +1,6 @@
 {
   "name": "gcal-to-org",
-  "version": "2.0.0",
+  "version": "2.0.1-SNAPSHOT",
   "description": "CLI for creating an Org Mode file based on meetings in a Google Calendar",
   "author": "Oliver Burn @oburn",
   "bin": {
