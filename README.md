@@ -10,22 +10,25 @@ Releases should be [available here](https://github.com/oburn/gcal-to-org/release
 # Usage
 
 ```
-prompt% gcal-to-org-macos --help
+prompt% gcal-to-org-macos generate --help
+Generates the org file
+
 USAGE
-  $ gcal-to-org FILE
+  $ gcal-to-org generate FILE [--port <value>] [--backDays <value>] [--forwardDays <value>]
 
 ARGUMENTS
   FILE  Path to output the Org file (will be overwritten)
 
-OPTIONS
-  -h, --help                 show CLI help
-  -v, --version              show CLI version
-  --backDays=backDays        [default: 720] How many days back to process events.
-  --forwardDays=forwardDays  [default: 365] How many days forward to process events.
-  --port=port                [default: 3000] The port to run the callback server on localhost.
+FLAGS
+  --backDays=<value>     [default: 30] How many days back to process events.
+  --forwardDays=<value>  [default: 60] How many days forward to process events.
+  --port=<value>         [default: 3000] The port to run the callback server on localhost.
 
 DESCRIPTION
-  Outputs your main Google Calendar in Org mode format
+  Generates the org file
+
+EXAMPLES
+  $ gcal-to-org generate gcalender.org
 ```
 
 When run for the first time it will ask you to authorise the CLI to have access to your Google Calendar. A token is stored in a data directory ([see here](https://oclif.io/docs/config) for the default on your OS). You can override by setting the `XDG_DATA_HOME` environment variable.
@@ -49,10 +52,26 @@ If you want to build this tool yourself, then you will need to register an Oauth
 
 To build from scratch, assuming you have installed oclif, nvm and pkg:
 
-```bash
-prompt% nvm use
+To build, it is assumed:
+
+1. `npm` is installed, either by `nvm` or `asdf`. If the later, then the `.tool-versions` file will have you sorted out.
+2. The latest version of `npm` is installed - you will be prompted if not
+3. The latest version of `pkg` is installed - done via `npm install -g pkg`
+
+Then it's a simple matter of:
+
+```zsh
 prompt% npm install
 prompt% npm run genbinary
 ```
 
 The binaries are in `dist`.
+
+If looking to update packages, use `npx npm-check` or `npx npm-check -u` if feeling brave.
+
+To run locally:
+
+- Before packaging - `XDG_DATA_HOME=/tmp/store ./bin/dev generate --backDays=1 --forwardDays=1 /tmp/gcal.org`
+- After packaging - `XDG_DATA_HOME=/tmp/store ./dist/gcal-to-org-macos generate --backDays=2 --forwardDays=2 /tmp/gcal.org`
+
+Remove `/tmp/store` to simulate starting from scratch.
