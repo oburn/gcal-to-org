@@ -41,13 +41,28 @@ prompt% XDG_DATA_HOME=/tmp/store gcal-to-org-macos --backDays=1 --forwardDays=1 
 
 # Development
 
-This CLI has been developed using:
-- [oclif framework](https://oclif.io/docs/introduction) using Typescript
-- [pkg](https://github.com/vercel/pkg) to generate the native image
-- [Node Version Manager](https://github.com/nvm-sh/nvm) for managing the Node environment
+My attempt at using Golang to solve the problem of converting from Google Calendar to Org mode file.
+
+Useful reference sites:
+
+- <https://gobyexample.com> - lots of examples
+- <https://pkg.go.dev> - packages
+- <https://github.com/timbray/topfew> - example of a simple CLI
+- <https://bencane.com/2020/12/29/how-to-structure-a-golang-cli-project/> - how to structure a CLI
+- [how to create oauth](https://pkg.go.dev/golang.org/x/oauth2@v0.0.0-20210402161424-2e8d93401602/google#hdr-OAuth2_Configs)
+
+# Dev Notes
+
+Initialised using `go mod init github.com/oburn/gcal-to-org-golang`
+
+When adding new packages, using `go mod tidy` to configure.
+
+Check in `go.mod` for tracking dependencies
+
+Run with `go run .`
+
+Build with `go build .`
 
 If you want to build this tool yourself, then you will need to register an Oauth app with Google via the [console](https://console.cloud.google.com/getting-started). You are on your own to do this. But when you do, you will need to:
 1. Copy `src/secrets.ts.template` to `src/secrets.ts`
 2. Fill in the `MY_CLIENT_ID` and `MY_CLIENT_SECRET` details.
-
-NEED TO ADD MORE FOR GOLANG
