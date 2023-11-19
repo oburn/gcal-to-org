@@ -50,28 +50,4 @@ If you want to build this tool yourself, then you will need to register an Oauth
 1. Copy `src/secrets.ts.template` to `src/secrets.ts`
 2. Fill in the `MY_CLIENT_ID` and `MY_CLIENT_SECRET` details.
 
-To build from scratch, assuming you have installed oclif, nvm and pkg:
-
-To build, it is assumed:
-
-1. `npm` is installed, either by `nvm` or `asdf`. If the later, then the `.tool-versions` file will have you sorted out.
-2. The latest version of `npm` is installed - you will be prompted if not
-3. The latest version of `pkg` is installed - done via `npm install -g pkg`
-
-Then it's a simple matter of:
-
-```zsh
-prompt% npm install
-prompt% npm run genbinary
-```
-
-The binaries are in `dist`.
-
-If looking to update packages, use `npx npm-check` or `npx npm-check -u` if feeling brave.
-
-To run locally:
-
-- Before packaging - `XDG_DATA_HOME=/tmp/store ./bin/dev generate --backDays=1 --forwardDays=1 /tmp/gcal.org`
-- After packaging - `XDG_DATA_HOME=/tmp/store ./dist/gcal-to-org-macos generate --backDays=2 --forwardDays=2 /tmp/gcal.org`
-
-Remove `/tmp/store` to simulate starting from scratch.
+NEED TO ADD MORE FOR GOLANG
