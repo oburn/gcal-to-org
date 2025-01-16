@@ -1,4 +1,4 @@
-.PHONY: help tidy test tui run
+.PHONY: help tidy test tui run build
 .DEFAULT_GOAL := help
 
 help:
@@ -19,3 +19,8 @@ test:	## Run all tests
 
 run:	## Run app using arguments specified with `make run ARGS="a b c"
 	go run . $(ARGS)
+
+build: gcal-to-org	## Build the binary file
+
+gcal-to-org: main.go secrets.go
+	go build .

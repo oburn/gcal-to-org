@@ -12,3 +12,4 @@ oclif.manifest.json
 /golang/secrets.go
 /golang/gcal-to-org
 /secrets.go
+/gcal-to-org
