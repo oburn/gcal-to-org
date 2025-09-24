@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -116,6 +117,23 @@ func optionalEvent(event *calendar.Event) string {
 	return ""
 }
 
+// Flag if a room is listed in the attendees
+func roomEvent(event *calendar.Event) string {
+	rePrefix := regexp.MustCompile(`^[^-]*-[^-]*-`)
+	reSuffix := regexp.MustCompile(` +\(.*$`)
+	reCollab := regexp.MustCompile(`Collab Studio - `)
+	for _, attendee := range event.Attendees {
+		if attendee.Resource && (attendee.ResponseStatus == "accepted") &&
+			strings.HasPrefix(attendee.DisplayName, "SYD 363 George St-") {
+			output := rePrefix.ReplaceAllString(attendee.DisplayName, "")
+			output = reSuffix.ReplaceAllString(output, "")
+			output = reCollab.ReplaceAllString(output, "")
+			return "/" + output + "/"
+		}
+	}
+	return "💻"
+}
+
 // Warning if I am the only person attending.
 func warningEvent(event *calendar.Event) string {
 	// Handle events where it's just me
@@ -149,7 +167,7 @@ func eventToOrg(event *calendar.Event) string {
 	}
 	endTime := endDateTime.Format("15:04")
 
-	return fmt.Sprintf("** %s%s [[%s][%s]] %s-%s <%s>\n", optionalEvent(event), warningEvent(event), event.HtmlLink, event.Summary, startTime, endTime, startDate)
+	return fmt.Sprintf("** %s%s [[%s][%s]] %s %s-%s <%s>\n", optionalEvent(event), warningEvent(event), event.HtmlLink, event.Summary, roomEvent(event), startTime, endTime, startDate)
 }
 
 func relevantEvent(event *calendar.Event) bool {
