@@ -188,7 +188,7 @@ func warningEvent(event *calendar.Event, self *calendar.EventAttendee) string {
 	}
 
 	for _, attendee := range event.Attendees {
-		if !attendee.Self && attendee.ResponseStatus == "accepted" { // someone is going
+		if !attendee.Self && !attendee.Resource && attendee.ResponseStatus == "accepted" { // someone is going
 			return ""
 		}
 	}
