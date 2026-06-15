@@ -134,47 +134,28 @@ func writeOutputFile(path string, write func(io.Writer) error) (err error) {
 }
 
 func writeEvents(w io.Writer, svc *calendar.Service, now time.Time, backDays, forwardDays int) error {
-	queryBase := svc.Events.List(primaryCalendarID).
+	return svc.Events.List(primaryCalendarID).
 		SingleEvents(true).
 		TimeMin(now.AddDate(0, 0, -backDays).Format(time.RFC3339)).
-		TimeMax(now.AddDate(0, 0, forwardDays).Format(time.RFC3339))
-	nextPageToken := ""
-
-	for {
-		query := queryBase
-		if nextPageToken != "" {
-			query = queryBase.PageToken(nextPageToken)
-		}
-
-		events, err := query.Do()
-		if err != nil {
-			return fmt.Errorf("retrieve calendar events: %w", err)
-		}
-		nextPageToken = events.NextPageToken
-
-		for _, event := range events.Items {
-			if !relevantEvent(event) {
-				continue
+		TimeMax(now.AddDate(0, 0, forwardDays).Format(time.RFC3339)).
+		Pages(context.Background(), func(events *calendar.Events) error {
+			for _, event := range events.Items {
+				if !relevantEvent(event) {
+					continue
+				}
+				output, err := eventToOrg(event, now)
+				if err != nil {
+					return err
+				}
+				if _, err := io.WriteString(w, output); err != nil {
+					return err
+				}
+				if _, err := io.WriteString(w, "\n"); err != nil {
+					return err
+				}
 			}
-
-			output, err := eventToOrg(event, now)
-			if err != nil {
-				return err
-			}
-			if _, err := io.WriteString(w, output); err != nil {
-				return err
-			}
-			if _, err := io.WriteString(w, "\n"); err != nil {
-				return err
-			}
-		}
-
-		if nextPageToken == "" {
-			break
-		}
-	}
-
-	return nil
+			return nil
+		})
 }
 
 var errUsage = errors.New("invalid arguments")
