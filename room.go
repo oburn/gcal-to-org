@@ -147,6 +147,7 @@ func findEventsWithoutRooms(ctx context.Context, svc *calendar.Service, now time
 
 	err := svc.Events.List(primaryCalendarID).
 		SingleEvents(true).
+		OrderBy("startTime").
 		TimeMin(now.Format(time.RFC3339)).
 		TimeMax(now.AddDate(0, 0, forwardDays).Format(time.RFC3339)).
 		Pages(ctx, func(events *calendar.Events) error {
