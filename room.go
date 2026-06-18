@@ -1,0 +1,194 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/urfave/cli/v2"
+	"google.golang.org/api/calendar/v3"
+)
+
+const defaultRoomForwardDays = 14
+
+func roomCommand() *cli.Command {
+	return &cli.Command{
+		Name:  "room",
+		Usage: "find upcoming events without rooms and suggest available rooms on L28/L30",
+		Flags: []cli.Flag{
+			&cli.IntFlag{
+				Name:  "forwardDays",
+				Value: defaultRoomForwardDays,
+				Usage: "How many days forward to look for events without rooms",
+			},
+		},
+		Action: func(c *cli.Context) error {
+			ctx := context.Background()
+			svc, err := newCalendarService(ctx, c.String("store"))
+			if err != nil {
+				return err
+			}
+
+			now := time.Now()
+
+			rooms, err := mineRoomResources(ctx, svc, now, defaultBackDays)
+			if err != nil {
+				return fmt.Errorf("mine room resources: %w", err)
+			}
+
+			if len(rooms) == 0 {
+				fmt.Println("No room resources found in calendar history — book a room first to seed the list.")
+				return nil
+			}
+
+			events, err := findEventsWithoutRooms(ctx, svc, now, c.Int("forwardDays"))
+			if err != nil {
+				return fmt.Errorf("find events without rooms: %w", err)
+			}
+
+			fmt.Printf("Events without rooms booked (next %d days):\n", c.Int("forwardDays"))
+
+			if len(events) == 0 {
+				fmt.Println("  No events without rooms found.")
+				return nil
+			}
+
+			for _, event := range events {
+				startDateTime, err := time.Parse(time.RFC3339, event.Start.DateTime)
+				if err != nil {
+					return fmt.Errorf("parse event start time: %w", err)
+				}
+				endDateTime, err := time.Parse(time.RFC3339, event.End.DateTime)
+				if err != nil {
+					return fmt.Errorf("parse event end time: %w", err)
+				}
+
+				fmt.Printf("\n  %s %s-%s  %s\n",
+					startDateTime.Format(dateLayout),
+					startDateTime.Format(timeLayout),
+					endDateTime.Format(timeLayout),
+					event.Summary,
+				)
+
+				available, err := availableRooms(ctx, svc, event.Start.DateTime, event.End.DateTime, rooms)
+				if err != nil {
+					return fmt.Errorf("check room availability: %w", err)
+				}
+
+				if len(available) == 0 {
+					fmt.Println("    No rooms available on L28/L30.")
+				} else {
+					fmt.Println("    Available on L28/L30:")
+					for _, r := range available {
+						fmt.Printf("      /%s/\n", r)
+					}
+				}
+			}
+
+			return nil
+		},
+	}
+}
+
+type roomResource struct {
+	email       string
+	displayName string
+}
+
+func mineRoomResources(ctx context.Context, svc *calendar.Service, now time.Time, backDays int) ([]roomResource, error) {
+	seen := make(map[string]string) // email -> displayName
+
+	err := svc.Events.List(primaryCalendarID).
+		SingleEvents(true).
+		TimeMin(now.AddDate(0, 0, -backDays).Format(time.RFC3339)).
+		TimeMax(now.Format(time.RFC3339)).
+		Pages(ctx, func(events *calendar.Events) error {
+			for _, event := range events.Items {
+				for _, attendee := range event.Attendees {
+					if !attendee.Resource {
+						continue
+					}
+					if !strings.HasPrefix(attendee.DisplayName, roomDisplayPrefix) {
+						continue
+					}
+					if !isLevel28or30(attendee.DisplayName) {
+						continue
+					}
+					seen[attendee.Email] = attendee.DisplayName
+				}
+			}
+			return nil
+		})
+	if err != nil {
+		return nil, err
+	}
+
+	rooms := make([]roomResource, 0, len(seen))
+	for email, name := range seen {
+		rooms = append(rooms, roomResource{email: email, displayName: name})
+	}
+	return rooms, nil
+}
+
+func isLevel28or30(displayName string) bool {
+	// Room names look like: "SYD 363 George St-28.xx-..." or "SYD 363 George St-30.xx-..."
+	// Match on "-28." or "-30." after the prefix.
+	after, _ := strings.CutPrefix(displayName, roomDisplayPrefix)
+	return strings.HasPrefix(after, "28.") || strings.HasPrefix(after, "30.")
+}
+
+func findEventsWithoutRooms(ctx context.Context, svc *calendar.Service, now time.Time, forwardDays int) ([]*calendar.Event, error) {
+	var result []*calendar.Event
+
+	err := svc.Events.List(primaryCalendarID).
+		SingleEvents(true).
+		TimeMin(now.Format(time.RFC3339)).
+		TimeMax(now.AddDate(0, 0, forwardDays).Format(time.RFC3339)).
+		Pages(ctx, func(events *calendar.Events) error {
+			for _, event := range events.Items {
+				if !relevantEvent(event) {
+					continue
+				}
+				if roomEvent(event) == "💻" {
+					result = append(result, event)
+				}
+			}
+			return nil
+		})
+
+	return result, err
+}
+
+func availableRooms(ctx context.Context, svc *calendar.Service, timeMin, timeMax string, rooms []roomResource) ([]string, error) {
+	items := make([]*calendar.FreeBusyRequestItem, len(rooms))
+	for i, r := range rooms {
+		items[i] = &calendar.FreeBusyRequestItem{Id: r.email}
+	}
+
+	fb, err := svc.Freebusy.Query(&calendar.FreeBusyRequest{
+		TimeMin: timeMin,
+		TimeMax: timeMax,
+		Items:   items,
+	}).Do()
+	if err != nil {
+		return nil, err
+	}
+
+	var available []string
+	for _, r := range rooms {
+		cal, ok := fb.Calendars[r.email]
+		if !ok || len(cal.Busy) == 0 {
+			name := formatRoomName(r.displayName)
+			available = append(available, name)
+		}
+	}
+	return available, nil
+}
+
+func formatRoomName(displayName string) string {
+	output := roomPrefixRE.ReplaceAllString(displayName, "")
+	output = roomSuffixRE.ReplaceAllString(output, "")
+	output = collabRE.ReplaceAllString(output, "")
+	return output
+}
