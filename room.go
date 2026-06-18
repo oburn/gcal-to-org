@@ -22,6 +22,11 @@ func roomCommand() *cli.Command {
 				Value: defaultRoomForwardDays,
 				Usage: "How many days forward to look for events without rooms",
 			},
+			&cli.IntFlag{
+				Name:  "backDays",
+				Value: 90,
+				Usage: "How many days back to mine for known room resources",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			ctx := context.Background()
@@ -32,7 +37,7 @@ func roomCommand() *cli.Command {
 
 			now := time.Now()
 
-			rooms, err := mineRoomResources(ctx, svc, now, defaultBackDays)
+			rooms, err := mineRoomResources(ctx, svc, now, c.Int("backDays"))
 			if err != nil {
 				return fmt.Errorf("mine room resources: %w", err)
 			}
@@ -132,10 +137,9 @@ func mineRoomResources(ctx context.Context, svc *calendar.Service, now time.Time
 }
 
 func isLevel28or30(displayName string) bool {
-	// Room names look like: "SYD 363 George St-28.xx-..." or "SYD 363 George St-30.xx-..."
-	// Match on "-28." or "-30." after the prefix.
+	// Room names: "SYD 363 George St-28-28.11 Name (cap) [type]"
 	after, _ := strings.CutPrefix(displayName, roomDisplayPrefix)
-	return strings.HasPrefix(after, "28.") || strings.HasPrefix(after, "30.")
+	return strings.HasPrefix(after, "28-") || strings.HasPrefix(after, "30-")
 }
 
 func findEventsWithoutRooms(ctx context.Context, svc *calendar.Service, now time.Time, forwardDays int) ([]*calendar.Event, error) {
