@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -34,64 +34,7 @@ func roomCommand() *cli.Command {
 			if err != nil {
 				return err
 			}
-
-			now := time.Now()
-
-			rooms, err := mineRoomResources(ctx, svc, now, c.Int("backDays"))
-			if err != nil {
-				return fmt.Errorf("mine room resources: %w", err)
-			}
-
-			if len(rooms) == 0 {
-				fmt.Println("No room resources found in calendar history — book a room first to seed the list.")
-				return nil
-			}
-
-			events, err := findEventsWithoutRooms(ctx, svc, now, c.Int("forwardDays"))
-			if err != nil {
-				return fmt.Errorf("find events without rooms: %w", err)
-			}
-
-			fmt.Printf("Events without rooms booked (next %d days):\n", c.Int("forwardDays"))
-
-			if len(events) == 0 {
-				fmt.Println("  No events without rooms found.")
-				return nil
-			}
-
-			for _, event := range events {
-				startDateTime, err := time.Parse(time.RFC3339, event.Start.DateTime)
-				if err != nil {
-					return fmt.Errorf("parse event start time: %w", err)
-				}
-				endDateTime, err := time.Parse(time.RFC3339, event.End.DateTime)
-				if err != nil {
-					return fmt.Errorf("parse event end time: %w", err)
-				}
-
-				fmt.Printf("\n  %s %s-%s  %s\n",
-					startDateTime.Format(dateLayout),
-					startDateTime.Format(timeLayout),
-					endDateTime.Format(timeLayout),
-					event.Summary,
-				)
-
-				available, err := availableRooms(ctx, svc, event.Start.DateTime, event.End.DateTime, rooms)
-				if err != nil {
-					return fmt.Errorf("check room availability: %w", err)
-				}
-
-				if len(available) == 0 {
-					fmt.Println("    No rooms available on L28/L30.")
-				} else {
-					fmt.Println("    Available on L28/L30:")
-					for _, r := range available {
-						fmt.Printf("      /%s/\n", r)
-					}
-				}
-			}
-
-			return nil
+			return runRoomTUI(ctx, svc, c.Int("backDays"), c.Int("forwardDays"))
 		},
 	}
 }
@@ -165,7 +108,7 @@ func findEventsWithoutRooms(ctx context.Context, svc *calendar.Service, now time
 	return result, err
 }
 
-func availableRooms(ctx context.Context, svc *calendar.Service, timeMin, timeMax string, rooms []roomResource) ([]string, error) {
+func availableRooms(ctx context.Context, svc *calendar.Service, timeMin, timeMax string, rooms []roomResource) ([]roomResource, error) {
 	items := make([]*calendar.FreeBusyRequestItem, len(rooms))
 	for i, r := range rooms {
 		items[i] = &calendar.FreeBusyRequestItem{Id: r.email}
@@ -180,15 +123,43 @@ func availableRooms(ctx context.Context, svc *calendar.Service, timeMin, timeMax
 		return nil, err
 	}
 
-	var available []string
+	var available []roomResource
 	for _, r := range rooms {
 		cal, ok := fb.Calendars[r.email]
 		if !ok || len(cal.Busy) == 0 {
-			name := formatRoomName(r.displayName)
-			available = append(available, name)
+			available = append(available, r)
 		}
 	}
 	return available, nil
+}
+
+func sortRooms(rooms []roomResource) {
+	sort.Slice(rooms, func(i, j int) bool {
+		zi := strings.Contains(rooms[i].displayName, "Zoom")
+		zj := strings.Contains(rooms[j].displayName, "Zoom")
+		if zi != zj {
+			return zi
+		}
+		return formatRoomName(rooms[i].displayName) < formatRoomName(rooms[j].displayName)
+	})
+}
+
+func bookRoom(ctx context.Context, svc *calendar.Service, event *calendar.Event, room roomResource) error {
+	patch := &calendar.Event{
+		Attendees: make([]*calendar.EventAttendee, 0, len(event.Attendees)+1),
+	}
+	for _, a := range event.Attendees {
+		patch.Attendees = append(patch.Attendees, a)
+	}
+	patch.Attendees = append(patch.Attendees, &calendar.EventAttendee{
+		Email:       room.email,
+		DisplayName: room.displayName,
+		Resource:    true,
+	})
+	_, err := svc.Events.Patch(primaryCalendarID, event.Id, patch).
+		SendUpdates("none").
+		Context(ctx).Do()
+	return err
 }
 
 func formatRoomName(displayName string) string {
