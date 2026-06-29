@@ -1,0 +1,42 @@
+version: '3'
+
+tasks:
+  default:
+    silent: true
+    cmds:
+      - task --list
+
+  upgrade-list:
+    desc: List available upgrades
+    cmds:
+      - go list -u -m all
+
+  upgrade-perform:
+    desc: Perform upgrade of dependencies
+    cmds:
+      - go get -u ./...
+      - go get -t -u ./...
+
+  tidy:
+    desc: Tidy up the modules
+    cmds:
+      - go mod tidy
+
+  test:
+    desc: Run all tests
+    cmds:
+      - go test -v
+
+  run:
+    desc: "Run app with arguments: task run -- generate /tmp/calendar.org"
+    cmds:
+      - go run . {{.CLI_ARGS}}
+
+  build:
+    desc: Build the binary file
+    sources:
+      - "*.go"
+    generates:
+      - gcal-to-org
+    cmds:
+      - go build .
